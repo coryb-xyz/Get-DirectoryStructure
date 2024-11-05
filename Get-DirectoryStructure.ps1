@@ -2,6 +2,63 @@ using namespace System.Collections.Generic
 using namespace System.Text
 using namespace System.IO
 
+<#
+.SYNOPSIS
+Retrieves and displays the directory structure of one or more paths.
+
+.DESCRIPTION
+The Get-DirectoryStructure cmdlet recursively retrieves and displays the directory structure of one or more specified paths. It provides a hierarchical view of directories and files, making it easier to understand the organization of your file system.
+
+Example Paths:
+C:\Projects\MyProject
+D:\Documents\Work
+
+Example Output:
+└── C:\
+    └── Projects\
+        └── MyProject\
+            ├── bin\
+            │   ├── Debug\
+            │   └── Release\
+            ├── obj\
+            │   ├── Debug\
+            │   └── Release\
+            ├── Properties\
+            │   └── AssemblyInfo.cs
+            ├── Program.cs
+            └── README.md
+
+└── D:\
+    └── Documents\
+        └── Work\
+            ├── Project1\
+            │   ├── src\
+            │   │   └── main.cpp
+            │   └── docs\
+            │       └── README.txt
+            └── Project2\
+                ├── data\
+                │   └── config.json
+                └── scripts\
+                    └── script.py
+
+.PARAMETER Path
+Specifies one or more paths for which to retrieve the directory structure. The default is the current working directory.
+
+.EXAMPLE
+Get-DirectoryStructure -Path C:\Projects
+
+Retrieves and displays the directory structure of the C:\Projects folder.
+
+.EXAMPLE
+Get-DirectoryStructure -Path C:\Projects, D:\Documents
+
+Retrieves and displays the directory structures of both the C:\Projects and D:\Documents folders.
+
+.NOTES
+This cmdlet uses a recursive approach to build the directory structure. It handles case-insensitive comparisons for directories and provides a clear, indented output.
+#>
+
 function Get-DirectoryStructure {
     [CmdletBinding()]
     param (
@@ -70,7 +127,7 @@ function Get-DirectoryStructure {
                 # If the current part is not already in the dictionary, add it with a new sorted dictionary for its children.
                 if (-not $currentLevel.ContainsKey($part)) {
                     $currentLevel[$part] = @{
-                        'Children' = [SortedDictionary[string, object]]::new($pathComparer)
+                        'Children'    = [SortedDictionary[string, object]]::new($pathComparer)
                         'IsDirectory' = -not $isLast -or (Test-Path -Path $path -PathType Container)
                     }
                 }
@@ -88,7 +145,6 @@ function Get-DirectoryStructure {
                 $indent = ''
             )
 
-            $keys = [string[]]$node.Keys
             for ($i = 0; $i -lt $keys.Count; $i++) {
                 $key = $keys[$i]
                 $child = $node[$key]
