@@ -60,6 +60,7 @@ This cmdlet uses a recursive approach to build the directory structure. It handl
 #>
 
 function Get-DirectoryStructure {
+   
     [CmdletBinding()]
     param (
         [Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
@@ -127,7 +128,7 @@ function Get-DirectoryStructure {
                 # If the current part is not already in the dictionary, add it with a new sorted dictionary for its children.
                 if (-not $currentLevel.ContainsKey($part)) {
                     $currentLevel[$part] = @{
-                        'Children'    = [SortedDictionary[string, object]]::new($pathComparer)
+                        'Children' = [SortedDictionary[string, object]]::new($pathComparer)
                         'IsDirectory' = -not $isLast -or (Test-Path -Path $path -PathType Container)
                     }
                 }
@@ -145,6 +146,7 @@ function Get-DirectoryStructure {
                 $indent = ''
             )
 
+            $keys = [string[]]$node.Keys
             for ($i = 0; $i -lt $keys.Count; $i++) {
                 $key = $keys[$i]
                 $child = $node[$key]
@@ -167,4 +169,5 @@ function Get-DirectoryStructure {
         # Return the final output as a string, trimming any trailing whitespace.
         $sb.ToString().TrimEnd()
     }
+
 }
